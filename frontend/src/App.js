@@ -10,14 +10,21 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle("dark", !darkMode);
+  };
 
   return (
-    <div className={darkMode ? "dark" : ""}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div>
+      <div
+        className={`min-h-screen ${
+          darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-800"
+        }`}
+      >
         <Router>
           <Routes>
             <Route

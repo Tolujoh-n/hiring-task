@@ -1,18 +1,29 @@
+// Updated Dashboard Component
 import React, { useState } from "react";
 import Modal from "./Modal";
+import {
+  FaPlus,
+  FaFilter,
+  FaEdit,
+  FaTrash,
+  FaBars,
+  FaSun,
+  FaMoon,
+} from "react-icons/fa";
 
 const dummyTodos = [
   {
     id: 1,
     title: "Project A",
-    description: "Description of Project A",
+    description:
+      "Description of Project A. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     status: false,
     dueDate: "2025-01-20",
   },
   {
     id: 2,
     title: "Project B",
-    description: "Description of Project B",
+    description: "Description of Project B. Lorem ipsum dolor sit amet.",
     status: true,
     dueDate: "2025-01-22",
   },
@@ -22,6 +33,8 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const [todos, setTodos] = useState(dummyTodos);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState("date-desc");
+  const [isNavOpen, setIsNavOpen] = useState(true);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -31,68 +44,130 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
     closeModal();
   };
 
+  const handleFilterChange = (filterType) => {
+    setFilter(filterType);
+    applyFilter(filterType);
+  };
+
+  const applyFilter = (filterType) => {
+    const sorted = [...todos].sort((a, b) => {
+      if (filterType.includes("date")) {
+        return filterType === "date-asc"
+          ? new Date(a.dueDate) - new Date(b.dueDate)
+          : new Date(b.dueDate) - new Date(a.dueDate);
+      } else {
+        return filterType === "name-asc"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      }
+    });
+    setTodos(sorted);
+  };
+
+  const sortedTodos = todos.sort((a, b) => {
+    if (filter.includes("date")) {
+      return filter === "date-asc"
+        ? new Date(a.dueDate) - new Date(b.dueDate)
+        : new Date(b.dueDate) - new Date(a.dueDate);
+    } else {
+      return filter === "name-asc"
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title);
+    }
+  });
+
   return (
-    <div className="flex min-h-screen">
+    <div className={`flex min-h-screen ${darkMode ? "dark" : ""}`}>
       {/* Side Navigation */}
-      <div className="w-64 bg-gray-200 dark:bg-gray-800 p-4">
-        <div className="flex justify-between items-center mb-6">
-          <button className="p-2">☰</button>
-          <div className="flex space-x-4">
-            <button className="p-2" onClick={openModal}>
-              ➕
+      {isNavOpen && (
+        <div className="fixed inset-0 w-64 bg-gray-200 dark:bg-gray-800 p-4 z-50">
+          <div className="flex justify-between items-center mb-6">
+            <button className="p-2" onClick={() => setIsNavOpen(false)}>
+              <FaBars />
             </button>
-            <button className="p-2">⋮</button>
+            <div className="flex space-x-4">
+              <button
+                className="p-2"
+                onClick={() => handleFilterChange("date-asc")}
+              >
+                <FaFilter />
+              </button>
+            </div>
           </div>
-        </div>
-        <ul className="overflow-y-auto space-y-2">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className={`p-2 rounded-lg cursor-pointer ${
-                selectedTodo?.id === todo.id
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-300 dark:bg-gray-700"
-              }`}
-              onClick={() => setSelectedTodo(todo)}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <input
-                    type="checkbox"
-                    checked={todo.status}
-                    onChange={() =>
-                      setTodos(
-                        todos.map((t) =>
-                          t.id === todo.id ? { ...t, status: !t.status } : t
+          <ul className="overflow-y-auto space-y-2">
+            {sortedTodos.map((todo) => (
+              <li
+                key={todo.id}
+                className={`p-2 rounded-lg cursor-pointer ${
+                  selectedTodo?.id === todo.id
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 dark:bg-gray-700"
+                }`}
+                onClick={() => setSelectedTodo(todo)}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="truncate">
+                    <input
+                      type="checkbox"
+                      checked={todo.status}
+                      onChange={() =>
+                        setTodos(
+                          todos.map((t) =>
+                            t.id === todo.id ? { ...t, status: !t.status } : t
+                          )
                         )
-                      )
-                    }
-                  />
-                  <span className="ml-2">{todo.title}</span>
+                      }
+                    />
+                    <span className="ml-2">{todo.title}</span>
+                  </div>
+                  <div className="hidden sm:flex space-x-2">
+                    <button onClick={() => setIsModalOpen(true)}>
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTodos(todos.filter((t) => t.id !== todo.id));
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button>✏️</button>
+                <div className="sm:hidden flex justify-between mt-2">
+                  <button className="text-blue-500" onClick={openModal}>
+                    <FaEdit />
+                  </button>
                   <button
-                    onClick={() =>
-                      setTodos(todos.filter((t) => t.id !== todo.id))
-                    }
+                    className="text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTodos(todos.filter((t) => t.id !== todo.id));
+                    }}
                   >
-                    🗑️
+                    <FaTrash />
                   </button>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Main Section */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 sm:p-8">
         <div className="flex justify-between items-center mb-8">
+          <button className="p-2" onClick={() => setIsNavOpen(!isNavOpen)}>
+            <FaBars />
+          </button>
           <h1 className="text-2xl font-bold">TODO</h1>
           <div className="flex items-center space-x-4">
-            <span>Username</span>
-            <button onClick={toggleDarkMode}>{darkMode ? "🌙" : "☀️"}</button>
+            <button className="p-2" onClick={openModal}>
+              <FaPlus />
+            </button>
+            <button onClick={toggleDarkMode}>
+              {darkMode ? <FaSun /> : <FaMoon />}
+            </button>
           </div>
         </div>
 
@@ -131,7 +206,13 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && <Modal onClose={closeModal} onSave={addTodo} />}
+      {isModalOpen && (
+        <Modal
+          onClose={closeModal}
+          onSave={addTodo}
+          selectedTodo={selectedTodo}
+        />
+      )}
     </div>
   );
 };
