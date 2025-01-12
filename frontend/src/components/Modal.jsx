@@ -32,22 +32,26 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-lg font-bold mb-4">
+        <h2 className="text-lg font-bold mb-4 dark:text-white">
           {selectedTodo ? "Edit Todo" : "Add New Todo"}
         </h2>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Title</label>
+          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+            Title
+          </label>
           <input
             type="text"
-            className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Description</label>
+          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+            Description
+          </label>
           <textarea
-            className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             rows="4"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -55,10 +59,12 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
         </div>
         <div className="mb-4 flex justify-between items-center">
           <div>
-            <label className="block text-sm font-medium mb-1">Due Date</label>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+              Due Date
+            </label>
             <input
               type="date"
-              className="p-2 border rounded dark:bg-gray-700 dark:text-white"
+              className="p-2 border border-gray-300 rounded bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
@@ -70,12 +76,12 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
               onChange={(e) => setStatus(e.target.checked)}
               className="h-4 w-4"
             />
-            <span className="text-sm">Completed</span>
+            <span className="text-sm dark:text-gray-300">Completed</span>
           </div>
         </div>
         <div className="flex justify-end space-x-4">
           <button
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             onClick={onClose}
           >
             Cancel

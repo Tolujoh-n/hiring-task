@@ -1,4 +1,3 @@
-// Updated Dashboard Component
 import React, { useState } from "react";
 import Modal from "./Modal";
 import {
@@ -80,14 +79,22 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
     <div className={`flex min-h-screen ${darkMode ? "dark" : ""}`}>
       {/* Side Navigation */}
       {isNavOpen && (
-        <div className="fixed inset-0 w-64 bg-gray-200 dark:bg-gray-800 p-4 z-50">
+        <div
+          className={`${
+            isNavOpen ? "block" : "hidden"
+          } md:block fixed inset-0 w-64 bg-gray-200 dark:bg-gray-800 p-4 z-50`}
+        >
           <div className="flex justify-between items-center mb-6">
-            <button className="p-2" onClick={() => setIsNavOpen(false)}>
+            {/* Mobile toggle button - hidden on medium and larger screens */}
+            <button
+              className="p-2 text-gray-100 md:hidden"
+              onClick={() => setIsNavOpen(false)}
+            >
               <FaBars />
             </button>
             <div className="flex space-x-4">
               <button
-                className="p-2"
+                className="p-2 text-gray-100"
                 onClick={() => handleFilterChange("date-asc")}
               >
                 <FaFilter />
@@ -101,7 +108,9 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
                 className={`p-2 rounded-lg cursor-pointer ${
                   selectedTodo?.id === todo.id
                     ? "bg-blue-500 text-white"
-                    : "bg-gray-300 dark:bg-gray-700"
+                    : darkMode
+                    ? "bg-gray-700 text-gray-300"
+                    : "bg-gray-100 text-gray-800"
                 }`}
                 onClick={() => setSelectedTodo(todo)}
               >
@@ -155,9 +164,12 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
       )}
 
       {/* Main Section */}
-      <div className="flex-1 p-4 sm:p-8">
+      <div className="flex-1 p-4 sm:p-8 md:ml-64 lg:ml-64">
         <div className="flex justify-between items-center mb-8">
-          <button className="p-2" onClick={() => setIsNavOpen(!isNavOpen)}>
+          <button
+            className="p-2 md:hidden lg:hidden"
+            onClick={() => setIsNavOpen(!isNavOpen)}
+          >
             <FaBars />
           </button>
           <h1 className="text-2xl font-bold">TODO</h1>
@@ -173,24 +185,34 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
 
         {/* Content */}
         {selectedTodo ? (
-          <div>
-            <h2 className="text-xl font-bold">{selectedTodo.title}</h2>
-            <div className="flex justify-between text-gray-600 dark:text-gray-300 mb-4">
-              <span>
-                Status: {selectedTodo.status ? "Completed" : "Not Completed"}
-              </span>
-              <span>Due Date: {selectedTodo.dueDate}</span>
-            </div>
-            <p className="mb-4">{selectedTodo.description}</p>
-            <button
-              className="p-2 bg-blue-600 text-white rounded"
-              onClick={openModal}
+          <div className="mt-12 sm:mt-16 px-4">
+            <div
+              className={`p-8 rounded-lg shadow-lg ${
+                darkMode
+                  ? "bg-gray-800 text-gray-100"
+                  : "bg-gray-100 text-gray-800"
+              }`}
             >
-              Edit
-            </button>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">{selectedTodo.title}</h2>
+                <FaEdit
+                  className="text-blue-500 cursor-pointer text-2xl"
+                  onClick={openModal}
+                />
+              </div>
+              <div className="flex justify-between text-lg mb-4">
+                <span>
+                  Status: {selectedTodo.status ? "Completed" : "Not Completed"}
+                </span>
+                <span>Due Date: {selectedTodo.dueDate}</span>
+              </div>
+              <p className="text-lg leading-relaxed">
+                {selectedTodo.description}
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="text-center">
+          <div className="text-center mt-12">
             <h2 className="text-3xl font-bold mb-4">
               Welcome to your TODO App
             </h2>
