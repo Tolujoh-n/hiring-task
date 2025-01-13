@@ -13,7 +13,7 @@ import {
 const dummyTodos = [
   {
     id: 1,
-    title: "Project A",
+    title: "Project nominating classification",
     description:
       "Description of Project A. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     status: false,
@@ -21,7 +21,7 @@ const dummyTodos = [
   },
   {
     id: 2,
-    title: "Project B",
+    title: "Project intact",
     description: "Description of Project B. Lorem ipsum dolor sit amet.",
     status: true,
     dueDate: "2025-01-22",
@@ -46,6 +46,20 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
   const handleFilterChange = (filterType) => {
     setFilter(filterType);
     applyFilter(filterType);
+  };
+  const handleStatusToggle = (todoId) => {
+    const updatedTodos = todos.map((t) =>
+      t.id === todoId ? { ...t, status: !t.status } : t
+    );
+    setTodos(updatedTodos);
+
+    // Update selectedTodo if it matches the toggled todo
+    if (selectedTodo?.id === todoId) {
+      setSelectedTodo({
+        ...selectedTodo,
+        status: !selectedTodo.status,
+      });
+    }
   };
 
   const applyFilter = (filterType) => {
@@ -201,9 +215,24 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
                 />
               </div>
               <div className="flex justify-between text-lg mb-4">
-                <span>
-                  Status: {selectedTodo.status ? "Completed" : "Not Completed"}
-                </span>
+                <div
+                  className={`flex items-center px-3 py-2 rounded-full cursor-pointer ${
+                    selectedTodo.status ? "bg-green-500" : "bg-gray-400"
+                  }`}
+                  onClick={() => handleStatusToggle(selectedTodo.id)}
+                >
+                  <div className="flex items-center justify-center w-5 h-5 mr-2 rounded-full text-sm">
+                    {selectedTodo.status ? (
+                      <span className="text-white">✔</span>
+                    ) : (
+                      <div className="w-2.5 h-2.5 bg-gray-600 rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-white text-sm md:text-base">
+                    {selectedTodo.status ? "Completed" : "Pending"}
+                  </span>
+                </div>
+
                 <span>Due Date: {selectedTodo.dueDate}</span>
               </div>
               <p className="text-lg leading-relaxed">
