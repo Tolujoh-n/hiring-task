@@ -33,6 +33,8 @@ const Login = ({ onLoginSuccess }) => {
       localStorage.setItem("jwtToken", token);
       toast.success("Login successful!");
       if (onLoginSuccess) onLoginSuccess();
+      // Redirect to the dashboard
+      navigate("/dashboard");
     } catch (error) {
       const errorMsg =
         error.response?.data || "Login failed. Please check your credentials.";
