@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -8,9 +8,24 @@ import {
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import { Toaster, toast } from "sonner";
+import axios from "axios";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) setIsLoggedIn(true);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    setIsLoggedIn(false);
+    toast.success("Logged out successfully");
+    window.location.href = "/login"; // Redirect to the login page
+  };
+
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -20,6 +35,7 @@ const App = () => {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <div
         className={`min-h-screen ${
           darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-800"
@@ -52,6 +68,7 @@ const App = () => {
                   <Dashboard
                     darkMode={darkMode}
                     toggleDarkMode={toggleDarkMode}
+                    handleLogout={handleLogout} 
                   />
                 ) : (
                   <Navigate to="/login" />

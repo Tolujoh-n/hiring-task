@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaMoon, FaSun } from "react-icons/fa";
+import { Toaster, toast } from "sonner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    usernameOrEmail: "",
+    password: "",
+  });
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -12,9 +18,26 @@ const Login = ({ onLoginSuccess }) => {
     document.documentElement.classList.toggle("dark", !darkMode);
   };
 
-  const handleLogin = () => {
-    // Your login logic here (e.g., API call)
-    onLoginSuccess();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:5140/api/v1/auth/login",
+        formData
+      );
+      const { token } = response.data;
+      localStorage.setItem("jwtToken", token);
+      toast.success("Login successful!");
+      if (onLoginSuccess) onLoginSuccess();
+    } catch (error) {
+      const errorMsg =
+        error.response?.data || "Login failed. Please check your credentials.";
+      toast.error(errorMsg);
+    }
   };
 
   return (
@@ -36,15 +59,17 @@ const Login = ({ onLoginSuccess }) => {
         {/* Login Form */}
         <div className="mb-4">
           <input
-            type="email"
-            placeholder="Enter your email"
+            type="text"
+            placeholder="Enter your email or username"
             className={`w-full p-3 rounded-md border ${
               darkMode
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="usernameOrEmail"
+            value={formData.usernameOrEmail}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="mb-6">
@@ -56,8 +81,10 @@ const Login = ({ onLoginSuccess }) => {
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
           />
         </div>
 

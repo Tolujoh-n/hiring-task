@@ -9,6 +9,8 @@ import {
   FaSun,
   FaMoon,
 } from "react-icons/fa";
+import { Toaster, toast } from "sonner";
+import axios from "axios";
 
 const dummyTodos = [
   {
@@ -28,7 +30,7 @@ const dummyTodos = [
   },
 ];
 
-const Dashboard = ({ darkMode, toggleDarkMode }) => {
+const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
   const [todos, setTodos] = useState(dummyTodos);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -174,6 +176,12 @@ const Dashboard = ({ darkMode, toggleDarkMode }) => {
               </li>
             ))}
           </ul>
+          <button
+            className="absolute bottom-0 inset-x-0 bg-red-500 text-white p-2 m-4 rounded-lg w-auto text-center hover:bg-red-600 transition-all duration-300"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         </div>
       )}
 

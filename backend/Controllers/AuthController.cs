@@ -35,35 +35,45 @@ namespace TodoApp.Controllers
             }
             return BadRequest(result.Errors);
         }
+    
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto model)
+public async Task<IActionResult> Login(LoginDto model)
+{
+    IdentityUser user = null;
+
+    if (model.UsernameOrEmail.Contains("@")) // Check if input is an email
+    {
+        user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
+    }
+    else
+    {
+        user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
+    }
+
+    if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+    {
+        var claims = new[]
         {
-            var user = await _userManager.FindByNameAsync(model.UsernameOrEmail) ??
-                       await _userManager.FindByEmailAsync(model.UsernameOrEmail);
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+        };
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var claims = new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
-                };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VGhpcyBpcyBhIHNlY3VyZSBzaWduaW5nIGtleSB3aXRoIGF0IGxlYXN0IDMyIGJ5dGVzLg==")); 
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: "todoapp",
+            audience: "todoapp",
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(30),
+            signingCredentials: creds
+        );
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey"));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                var token = new JwtSecurityToken(
-                    issuer: "todoapp",
-                    audience: "todoapp",
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
-                    signingCredentials: creds
-                );
+        return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+    }
 
-                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
-            }
+    return Unauthorized("Invalid credentials");
+}
 
-            return Unauthorized("Invalid credentials");
-        }
     }
 }

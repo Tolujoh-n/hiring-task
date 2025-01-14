@@ -1,26 +1,90 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaMoon, FaSun } from "react-icons/fa";
+import { Toaster, toast } from "sonner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = ({ onSignupSuccess }) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [passwordValidations, setPasswordValidations] = useState({
+    hasNonAlphanumeric: false,
+    hasDigit: false,
+    hasUpperCase: false,
+    passwordsMatch: false,
+  });
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark", !darkMode);
   };
 
-  const handleSignup = () => {
-    // Your signup logic here (e.g., API call)
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Update password validations only if the password or confirmPassword fields are modified
+    if (e.target.name === "password" || e.target.name === "confirmPassword") {
+      const password = formData.password;
+
+      setPasswordValidations({
+        hasNonAlphanumeric: /[^a-zA-Z0-9]/.test(password),
+        hasDigit: /\d/.test(password),
+        hasUpperCase: /[A-Z]/.test(password),
+      });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
       return;
     }
-    onSignupSuccess();
+
+    // Check if all validations are met
+    if (
+      !passwordValidations.hasNonAlphanumeric ||
+      !passwordValidations.hasDigit ||
+      !passwordValidations.hasUpperCase
+    ) {
+      toast.error("Please make sure all password requirements are met.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5140/api/v1/auth/register",
+        formData
+      );
+      toast.success("User registered successfully!");
+
+      // After successful registration, redirect to the dashboard
+      navigate("/dashboard"); // Redirect to dashboard
+
+      if (onSignupSuccess) onSignupSuccess();
+    } catch (error) {
+      let errorMsg = "An error occurred!";
+      if (error.response && error.response.data) {
+        if (Array.isArray(error.response.data.errors)) {
+          errorMsg = error.response.data.errors.join(", ");
+        } else if (typeof error.response.data === "string") {
+          errorMsg = error.response.data;
+        } else if (
+          error.response.data.code &&
+          error.response.data.description
+        ) {
+          errorMsg = `${error.response.data.code}: ${error.response.data.description}`;
+        }
+      }
+      toast.error(errorMsg);
+    }
   };
 
   return (
@@ -49,8 +113,10 @@ const Signup = ({ onSignupSuccess }) => {
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -64,8 +130,10 @@ const Signup = ({ onSignupSuccess }) => {
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -79,8 +147,10 @@ const Signup = ({ onSignupSuccess }) => {
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -94,14 +164,70 @@ const Signup = ({ onSignupSuccess }) => {
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
           />
+          <div className="mt-2 space-y-1 text-sm">
+            <div
+              className={`flex items-center ${
+                passwordValidations.hasNonAlphanumeric
+                  ? "text-green-600"
+                  : "text-red-600"
+              }`}
+            >
+              <span
+                className={`mr-2 ${
+                  passwordValidations.hasNonAlphanumeric
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {passwordValidations.hasNonAlphanumeric ? "✔" : "✘"}
+              </span>
+              Must contain a non-alphanumeric character
+            </div>
+            <div
+              className={`flex items-center ${
+                passwordValidations.hasDigit ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              <span
+                className={`mr-2 ${
+                  passwordValidations.hasDigit
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {passwordValidations.hasDigit ? "✔" : "✘"}
+              </span>
+              Must contain a digit
+            </div>
+            <div
+              className={`flex items-center ${
+                passwordValidations.hasUpperCase
+                  ? "text-green-600"
+                  : "text-red-600"
+              }`}
+            >
+              <span
+                className={`mr-2 ${
+                  passwordValidations.hasUpperCase
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {passwordValidations.hasUpperCase ? "✔" : "✘"}
+              </span>
+              Must contain an uppercase letter
+            </div>
+          </div>
         </div>
 
         {/* Signup Button */}
         <button
-          onClick={handleSignup}
+          onClick={handleSubmit}
           className={`w-full p-3 rounded-md bg-blue-600 text-white font-bold transition duration-200 hover:bg-blue-500 ${
             darkMode ? "bg-blue-500" : "bg-blue-600"
           }`}
