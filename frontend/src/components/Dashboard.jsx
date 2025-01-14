@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import {
   FaPlus,
@@ -9,41 +9,82 @@ import {
   FaSun,
   FaMoon,
 } from "react-icons/fa";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import axios from "axios";
 
-const dummyTodos = [
-  {
-    id: 1,
-    title: "Project nominating classification",
-    description:
-      "Description of Project A. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    status: false,
-    dueDate: "2025-01-20",
-  },
-  {
-    id: 2,
-    title: "Project intact",
-    description: "Description of Project B. Lorem ipsum dolor sit amet.",
-    status: true,
-    dueDate: "2025-01-22",
-  },
-];
-
 const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
-  const [todos, setTodos] = useState(dummyTodos);
+  const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState("date-desc");
   const [isNavOpen, setIsNavOpen] = useState(true);
 
+  const fetchTodos = async () => {
+    try {
+      const response = await axios.get("/api/v1/todos");
+      setTodos(response.data);
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+      toast.error("Failed to fetch todos");
+    }
+  };
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/v1/todos/${id}`);
+      setTodos(todos.filter((todo) => todo.id !== id));
+      toast.success("Todo deleted successfully");
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      toast.error("Failed to delete todo");
+    }
+  };
+
+  const handleAddTodo = async (newTodo) => {
+    try {
+      const response = await axios.post("/api/v1/todos", newTodo);
+      setTodos([...todos, response.data]);
+      toast.success("Todo added successfully");
+      closeModal();
+    } catch (error) {
+      console.error("Error adding todo:", error);
+      toast.error("Failed to add todo");
+    }
+  };
+
+  const handleUpdateTodo = async (updatedTodo) => {
+    try {
+      const response = await axios.put(
+        `/api/v1/todos/${updatedTodo.id}`,
+        updatedTodo
+      );
+      setTodos(
+        todos.map((todo) => (todo.id === updatedTodo.id ? response.data : todo))
+      );
+      toast.success("Todo updated successfully");
+      closeModal();
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      toast.error("Failed to update todo");
+    }
+  };
+
+  const openModalForAdd = () => {
+    setSelectedTodo(null); // Reset the selected todo
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (todo) => {
+    setSelectedTodo(todo);
+    setIsModalOpen(true);
+  };
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  const addTodo = (newTodo) => {
-    setTodos([...todos, { id: todos.length + 1, ...newTodo }]);
-    closeModal();
-  };
 
   const handleFilterChange = (filterType) => {
     setFilter(filterType);
@@ -160,14 +201,20 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
                   </div>
                 </div>
                 <div className="sm:hidden flex justify-between mt-2">
-                  <button className="text-blue-500" onClick={openModal}>
+                  <button
+                    className="text-blue-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(todo);
+                    }}
+                  >
                     <FaEdit />
                   </button>
                   <button
                     className="text-red-500"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setTodos(todos.filter((t) => t.id !== todo.id));
+                      handleDelete(todo.id);
                     }}
                   >
                     <FaTrash />
@@ -196,7 +243,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
           </button>
           <h1 className="text-2xl font-bold">TODO</h1>
           <div className="flex items-center space-x-4">
-            <button className="p-2" onClick={openModal}>
+            <button className="p-2" onClick={openModalForAdd}>
               <FaPlus />
             </button>
             <button onClick={toggleDarkMode}>
@@ -256,7 +303,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
             <p className="mb-6">Start by adding your first task.</p>
             <button
               className="p-4 bg-blue-600 text-white rounded"
-              onClick={openModal}
+              onClick={openModalForAdd}
             >
               Add Task
             </button>
@@ -267,9 +314,10 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
       {/* Modal */}
       {isModalOpen && (
         <Modal
+          isOpen={isModalOpen}
           onClose={closeModal}
-          onSave={addTodo}
-          selectedTodo={selectedTodo}
+          onSave={selectedTodo ? handleUpdateTodo : handleAddTodo}
+          todo={selectedTodo}
         />
       )}
     </div>

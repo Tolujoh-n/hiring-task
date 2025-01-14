@@ -11,12 +11,21 @@ import Dashboard from "./components/Dashboard";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 
+axios.defaults.baseURL = "http://localhost:5140"; // Set the backend base URL
+axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem(
+  "jwtToken"
+)}`;
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Check if the user is loggedin
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    if (token) setIsLoggedIn(true);
+    const token = localStorage.getItem("jwtToken"); // Or sessionStorage
+    if (token) {
+      // Optionally validate token or decode it
+      setIsLoggedIn(true);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -68,7 +77,7 @@ const App = () => {
                   <Dashboard
                     darkMode={darkMode}
                     toggleDarkMode={toggleDarkMode}
-                    handleLogout={handleLogout} 
+                    handleLogout={handleLogout}
                   />
                 ) : (
                   <Navigate to="/login" />

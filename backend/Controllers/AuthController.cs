@@ -67,7 +67,7 @@ namespace TodoApp.Controllers
                     issuer: _configuration["JwtSettings:Issuer"],
                     audience: _configuration["JwtSettings:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
+                    expires: DateTime.Now.AddMinutes(90),
                     signingCredentials: creds
                 );
 
