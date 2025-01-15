@@ -65,11 +65,12 @@ const Signup = ({ onSignupSuccess }) => {
     try {
       const response = await axios.post("/api/v1/auth/register", formData);
       toast.success("User registered successfully!");
+      toast.success("Login your account!");
 
       if (onSignupSuccess) onSignupSuccess();
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
-      let errorMsg = "An error occurred during signup.";
+      let errorMsg = "An error occurred during signup(change username).";
       if (error.response && error.response.data) {
         if (Array.isArray(error.response.data.errors)) {
           errorMsg = error.response.data.errors.join(", ");

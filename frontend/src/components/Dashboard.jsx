@@ -231,14 +231,14 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
           <div className="flex justify-between items-center mb-6">
             {/* Mobile toggle button - hidden on medium and larger screens */}
             <button
-              className="p-2 text-gray-100 md:hidden"
+              className="p-2 md:hidden"
               onClick={() => setIsNavOpen(false)}
             >
               <FaBars />
             </button>
             <div className="flex space-x-4">
               <button
-                className="p-2 text-gray-100"
+                className="p-2"
                 onClick={() => handleFilterChange("date-asc")}
               >
                 <FaFilter />
@@ -252,9 +252,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
                 className={`p-2 rounded-lg cursor-pointer ${
                   selectedTodo?.id === todo.id
                     ? "bg-blue-500 text-white"
-                    : darkMode
-                    ? "bg-gray-700 text-gray-300"
-                    : "bg-gray-100 text-gray-800"
+                    : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                 }`}
                 onClick={() => setSelectedTodo(todo)}
               >
@@ -342,28 +340,23 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
         {/* Content */}
         {selectedTodo ? (
           <div className="mt-12 sm:mt-16 px-4">
-            <div
-              className={`p-8 rounded-lg shadow-lg ${
-                darkMode
-                  ? "bg-gray-800 text-gray-100"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
+            <div className="p-8 rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-100 transition-colors duration-300">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">{selectedTodo.title}</h2>
+                <h2 className="text-2xl font-semibold">{selectedTodo.title}</h2>
                 <FaEdit
-                  className="text-blue-500 cursor-pointer text-2xl"
+                  className="text-blue-500 cursor-pointer text-2xl transition-transform duration-300 hover:scale-110"
                   onClick={openModal}
                 />
               </div>
+
               <div className="flex justify-between text-lg mb-4">
                 <div
-                  className={`flex items-center px-3 py-2 rounded-full cursor-pointer ${
+                  className={`flex items-center px-4 py-2 rounded-full cursor-pointer transition-colors duration-300 ${
                     selectedTodo.status ? "bg-green-500" : "bg-gray-400"
                   }`}
                   onClick={() => handleStatusToggle(selectedTodo.id)}
                 >
-                  <div className="flex items-center justify-center w-5 h-5 mr-2 rounded-full text-sm">
+                  <div className="flex items-center justify-center w-6 h-6 mr-2 rounded-full text-sm">
                     {selectedTodo.status ? (
                       <span className="text-white">✔</span>
                     ) : (
@@ -375,9 +368,12 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
                   </span>
                 </div>
 
-                <span>Due Date: {selectedTodo.dueDate}</span>
+                <span className="text-sm md:text-base font-medium">
+                  Due Date: {selectedTodo.dueDate}
+                </span>
               </div>
-              <p className="text-lg leading-relaxed">
+
+              <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
                 {selectedTodo.description}
               </p>
             </div>
