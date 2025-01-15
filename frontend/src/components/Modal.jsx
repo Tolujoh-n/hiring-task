@@ -10,29 +10,34 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
 
   useEffect(() => {
     if (selectedTodo) {
-      setTitle(selectedTodo.title);
-      setDescription(selectedTodo.description);
-      setStatus(selectedTodo.status);
-      setDueDate(selectedTodo.dueDate);
+      setTitle(selectedTodo.title || "");
+      setDescription(selectedTodo.description || "");
+      setStatus(selectedTodo.status || false);
+      setDueDate(selectedTodo.dueDate || "");
     }
   }, [selectedTodo]);
 
   const handleSave = () => {
-    // Validation for empty fields
     if (title.trim() === "" || description.trim() === "" || !dueDate) {
       toast.error("Please fill out all fields.");
       return;
     }
 
+    const currentDate = new Date().toISOString().split("T")[0];
+    if (new Date(dueDate) < new Date(currentDate)) {
+      toast.error("Due date cannot be in the past.");
+      return;
+    }
+
     const todoData = {
+      id: selectedTodo?.id, // Ensure the ID is passed for updating
       title,
       description,
       status,
       dueDate,
     };
 
-    // Call the onSave callback passed from the parent with todoData
-    onSave(todoData);
+    onSave(todoData); // Call the parent `onSave` method with the updated todo
     toast.success(
       selectedTodo ? "Todo updated successfully!" : "Todo added successfully!"
     );
@@ -56,6 +61,7 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
               className="w-full p-2 border border-gray-300 rounded bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter title"
             />
           </div>
           <div className="mb-4">
@@ -67,6 +73,7 @@ const Modal = ({ onClose, onSave, selectedTodo }) => {
               rows="4"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter description"
             />
           </div>
           <div className="mb-4 flex justify-between items-center">

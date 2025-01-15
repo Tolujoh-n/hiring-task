@@ -126,18 +126,27 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
 
   // Update a todo
   const handleUpdateTodo = async (updatedTodo) => {
+    console.log("Updated Todo:", updatedTodo);
+
+    // Ensure userId is included in the request payload
+    const todoToUpdate = { ...updatedTodo, userId };
+
     try {
       const response = await axios.put(
         `/api/v1/todos/${updatedTodo.id}`,
-        { ...updatedTodo, userId },
+        todoToUpdate,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+
+      // Update the todos list with the new data
       setTodos(
-        todos.map((todo) => (todo.id === updatedTodo.id ? response.data : todo))
+        todos.map((todo) =>
+          todo.id === updatedTodo.id ? { ...todo, ...response.data } : todo
+        )
       );
       toast.success("Todo updated successfully");
       closeModal();
@@ -195,8 +204,8 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   };
 
   const handleEdit = (todo) => {
-    setSelectedTodo(todo); // Prefill modal with todo details
-    setIsModalOpen(true);
+    setSelectedTodo(todo); // Set the todo to edit
+    setIsModalOpen(true); // Open the modal
   };
 
   const openModal = () => setIsModalOpen(true);
@@ -264,7 +273,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
                   </div>
                   <div className="hidden sm:flex space-x-2">
                     <button
-                      className="text-blue-500"
+                      className=""
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEdit(todo);
@@ -397,7 +406,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
           isOpen={isModalOpen}
           onClose={closeModal}
           onSave={selectedTodo ? handleUpdateTodo : handleAddTodo}
-          todo={selectedTodo}
+          selectedTodo={selectedTodo}
         />
       )}
     </div>
