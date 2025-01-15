@@ -126,7 +126,11 @@ const App = () => {
             path="/dashboard"
             element={
               isLoggedIn ? (
-                <Dashboard userId={userId} onLogout={handleLogout} />
+                <Dashboard
+                  userId={userId}
+                  onLogout={handleLogout}
+                  toggleDarkMode={toggleDarkMode}
+                />
               ) : (
                 <Navigate to="/login" />
               )

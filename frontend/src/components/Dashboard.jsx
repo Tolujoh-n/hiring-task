@@ -71,6 +71,33 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
     }
   };
 
+  const handleStatusToggle = async (todoId) => {
+    try {
+      const todoToUpdate = todos.find((t) => t.id === todoId);
+      const updatedStatus = !todoToUpdate.status;
+
+      const response = await axios.put(
+        `http://localhost:5140/api/v1/todos/${todoId}`,
+        { ...todoToUpdate, status: updatedStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setTodos(
+        todos.map((t) =>
+          t.id === todoId ? { ...t, status: response.data.status } : t
+        )
+      );
+      toast.success("Todo status updated successfully");
+    } catch (error) {
+      console.error("Error updating todo status:", error);
+      toast.error("Failed to update status");
+    }
+  };
+
   // Load data on mount
   useEffect(() => {
     if (!userId || !username) {
@@ -171,27 +198,12 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   };
 
   const handleEdit = (todo) => {
-    setSelectedTodo(todo);
+    setSelectedTodo(todo); // Prefill modal with todo details
     setIsModalOpen(true);
   };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  const handleStatusToggle = (todoId) => {
-    const updatedTodos = todos.map((t) =>
-      t.id === todoId ? { ...t, status: !t.status } : t
-    );
-    setTodos(updatedTodos);
-
-    // Update selectedTodo if it matches the toggled todo
-    if (selectedTodo?.id === todoId) {
-      setSelectedTodo({
-        ...selectedTodo,
-        status: !selectedTodo.status,
-      });
-    }
-  };
 
   const sortedTodos = Array.isArray(todos)
     ? todos.sort((a, b) => {
@@ -251,24 +263,24 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
                     <input
                       type="checkbox"
                       checked={todo.status}
-                      onChange={() =>
-                        setTodos(
-                          todos.map((t) =>
-                            t.id === todo.id ? { ...t, status: !t.status } : t
-                          )
-                        )
-                      }
+                      onChange={() => handleStatusToggle(todo.id)}
                     />
                     <span className="ml-2">{todo.title}</span>
                   </div>
                   <div className="hidden sm:flex space-x-2">
-                    <button onClick={() => setIsModalOpen(true)}>
+                    <button
+                      className="text-blue-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(todo);
+                      }}
+                    >
                       <FaEdit />
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setTodos(todos.filter((t) => t.id !== todo.id));
+                        handleDelete(todo.id);
                       }}
                     >
                       <FaTrash />

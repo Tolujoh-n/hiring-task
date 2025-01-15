@@ -6,12 +6,15 @@ Develop a full stack Todo List application using the provided backend code for a
 ## Run your backend
 - `cd backend`
 - Install the below
+
 ```
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 dotnet add package Microsoft.EntityFrameworkCore
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+
+```
 
 ## Technologies
 - **Backend:** Express.js (authentication code provided)
