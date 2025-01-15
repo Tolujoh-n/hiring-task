@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TodoApp.Models;
+using TodoApp.Services; // Add this
 
 namespace TodoApp
 {
@@ -51,6 +52,9 @@ namespace TodoApp
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
+
+            // Register RefreshTokenService
+            services.AddSingleton<IRefreshTokenService, RefreshTokenService>();
 
             // Add Controllers
             services.AddControllers();

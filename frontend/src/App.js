@@ -22,34 +22,50 @@ const App = () => {
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("jwtToken");
+    localStorage.removeItem("refreshToken");
     setIsLoggedIn(false);
     setUserId(null);
     toast.success("Logged out successfully");
   };
 
+  // Refresh token function
+  const refreshToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) {
+      handleLogout();
+      return;
+    }
+    try {
+      const response = await axios.post("/api/v1/auth/refresh-token", {
+        token: refreshToken,
+      });
+      const { token, refreshToken: newRefreshToken } = response.data;
+      localStorage.setItem("jwtToken", token);
+      localStorage.setItem("refreshToken", newRefreshToken);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      handleLogout();
+    }
+  };
+
   // Verify token and fetch user info
   const verifyAndFetchUserInfo = async () => {
     const token = localStorage.getItem("jwtToken");
-    console.log("Token from localStorage:", token);
-
     if (token) {
       try {
         // Decode token to check expiration
         const decoded = jwtDecode(token);
         const isTokenExpired = decoded.exp * 1000 < Date.now();
         if (isTokenExpired) {
-          handleLogout();
+          await refreshToken();
         } else {
           setIsLoggedIn(true);
-
-          // Fetch user info from API
           const userInfoResponse = await axios.get("/api/v1/auth/user-info", {
             headers: { Authorization: `Bearer ${token}` },
           });
-
           const { userId, username } = userInfoResponse.data;
           setUserId(userId);
-
           console.log("User Info:", { userId, username });
         }
       } catch (error) {

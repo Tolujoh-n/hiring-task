@@ -10,8 +10,7 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
     usernameOrEmail: "",
     password: "",
   });
-  const [userId, setUserId] = useState(null); // Define setUserId state
-  const [userInfo, setUserInfo] = useState(null); // Optional state to store user info
+  const [userId, setUserId] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,8 +20,12 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
     e.preventDefault();
     try {
       const response = await axios.post("/api/v1/auth/login", formData);
-      const token = response.data.token;
+      const { token, refreshToken } = response.data;
       localStorage.setItem("jwtToken", token);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      localStorage.setItem("jwtToken", token);
+      localStorage.setItem("refreshToken", refreshToken);
 
       // Fetch user info after login
       const userInfoResponse = await axios.get("/api/v1/auth/user-info", {
@@ -31,15 +34,10 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
 
       const { userId, username } = userInfoResponse.data;
 
-      // Store the user info in state and console log
       setUserId(userId);
-      setUserInfo({ userId, username, token });
 
-      console.log("User ID:", userId);
-      console.log("Token:", token);
-      console.log("Username:", username);
+      onLoginSuccess(); // Notify App.js to update state
 
-      onLoginSuccess();
       toast.success("Login successful!");
       navigate("/dashboard");
     } catch (error) {
@@ -97,27 +95,20 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
           </div>
           <button
             type="submit"
-            className="w-full p-3 rounded-md bg-blue-600 text-white font-bold transition duration-200 hover:bg-blue-500"
+            className="w-full p-3 rounded-md bg-blue-500 text-white"
           >
             Login
           </button>
         </form>
 
-        <div className="mt-4 text-center">
-          <p className="text-sm">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600">
-              Register
-            </Link>
-          </p>
+        <div className="mt-6">
+          <Link
+            to="/signup"
+            className="text-blue-500 hover:text-blue-600 text-sm"
+          >
+            Don't have an account? Sign up
+          </Link>
         </div>
-
-        <button
-          onClick={toggleDarkMode}
-          className="absolute top-4 right-4 text-2xl"
-        >
-          {darkMode ? <FaSun /> : <FaMoon />}
-        </button>
       </div>
     </div>
   );
