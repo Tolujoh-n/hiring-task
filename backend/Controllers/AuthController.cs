@@ -38,43 +38,65 @@ namespace TodoApp.Controllers
             return BadRequest(result.Errors);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto model)
+
+
+       [HttpPost("login")]
+public async Task<IActionResult> Login(LoginDto model)
+{
+    IdentityUser user = null;
+
+    // Check if input is an email
+    if (model.UsernameOrEmail.Contains("@"))
+    {
+        user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
+    }
+    else
+    {
+        user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
+    }
+
+    if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+    {
+        var claims = new[]
         {
-            IdentityUser user = null;
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, user.Id)
+        };
 
-            // Check if input is an email
-            if (model.UsernameOrEmail.Contains("@"))
-            {
-                user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
-            }
-            else
-            {
-                user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
-            }
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var claims = new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
-                };
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddDays(1), // Token valid for 1 day
+            Issuer = _configuration["JwtSettings:Issuer"],
+            Audience = _configuration["JwtSettings:Audience"],
+            SigningCredentials = creds
+        };
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["JwtSettings:Issuer"],
-                    audience: _configuration["JwtSettings:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(90),
-                    signingCredentials: creds
-                );
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
 
-                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
-            }
+        return Ok(new { token = tokenHandler.WriteToken(token) });
+    }
 
-            return Unauthorized("Invalid credentials");
-        }
+    return Unauthorized("Invalid credentials");
+}
+[HttpGet("user-info")]
+[Authorize]
+public IActionResult GetUserInfo()
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var username = User.FindFirstValue(ClaimTypes.Name);
+    
+    if (string.IsNullOrEmpty(userId))
+    {
+        return Unauthorized("User ID not found in token.");
+    }
+    
+    return Ok(new { userId, username });
+}
     }
 }

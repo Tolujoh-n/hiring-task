@@ -21,12 +21,18 @@ namespace TodoApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTodos()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var todos = await _context.TodoItems.Where(t => t.UserId == userId).ToListAsync();
-            return Ok(todos);
-        }
+public async Task<IActionResult> GetTodos()
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var todos = await _context.TodoItems.Where(t => t.UserId == userId).ToListAsync();
+
+    if (todos == null || !todos.Any())
+    {
+        return NoContent(); // Handle empty response
+    }
+
+    return Ok(todos); // Ensure this is always valid JSON
+}
 
         [HttpPost]
         public async Task<IActionResult> CreateTodo(TodoItem model)

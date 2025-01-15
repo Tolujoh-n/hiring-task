@@ -14,6 +14,7 @@ const Signup = ({ onSignupSuccess }) => {
     password: "",
     confirmPassword: "",
   });
+
   const [passwordValidations, setPasswordValidations] = useState({
     hasNonAlphanumeric: false,
     hasDigit: false,
@@ -27,60 +28,53 @@ const Signup = ({ onSignupSuccess }) => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Update password validations only if the password or confirmPassword fields are modified
-    if (e.target.name === "password" || e.target.name === "confirmPassword") {
-      const password = formData.password;
+    if (name === "password" || name === "confirmPassword") {
+      const password = name === "password" ? value : formData.password;
+      const confirmPassword =
+        name === "confirmPassword" ? value : formData.confirmPassword;
 
       setPasswordValidations({
         hasNonAlphanumeric: /[^a-zA-Z0-9]/.test(password),
         hasDigit: /\d/.test(password),
         hasUpperCase: /[A-Z]/.test(password),
+        passwordsMatch: password === confirmPassword,
       });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+
+    if (!passwordValidations.passwordsMatch) {
       toast.error("Passwords do not match!");
       return;
     }
 
-    // Check if all validations are met
     if (
       !passwordValidations.hasNonAlphanumeric ||
       !passwordValidations.hasDigit ||
       !passwordValidations.hasUpperCase
     ) {
-      toast.error("Please make sure all password requirements are met.");
+      toast.error("Please ensure your password meets all requirements.");
       return;
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5140/api/v1/auth/register",
-        formData
-      );
+      const response = await axios.post("/api/v1/auth/register", formData);
       toast.success("User registered successfully!");
 
-      // After successful registration, redirect to the dashboard
-      navigate("/dashboard"); // Redirect to dashboard
-
       if (onSignupSuccess) onSignupSuccess();
+      navigate("/dashboard");
     } catch (error) {
-      let errorMsg = "An error occurred!";
+      let errorMsg = "An error occurred during signup.";
       if (error.response && error.response.data) {
         if (Array.isArray(error.response.data.errors)) {
           errorMsg = error.response.data.errors.join(", ");
         } else if (typeof error.response.data === "string") {
           errorMsg = error.response.data;
-        } else if (
-          error.response.data.code &&
-          error.response.data.description
-        ) {
-          errorMsg = `${error.response.data.code}: ${error.response.data.description}`;
         }
       }
       toast.error(errorMsg);
@@ -99,24 +93,25 @@ const Signup = ({ onSignupSuccess }) => {
         }`}
       >
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-left">TODO</h1>
-          <h2 className="text-sm text-right">Sign Up</h2>
+          <h1 className="text-3xl font-bold">TODO</h1>
+          <h2 className="text-sm">Sign Up</h2>
         </div>
 
         {/* Username Field */}
         <div className="mb-4">
           <input
             type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
             placeholder="Enter your username"
             className={`w-full p-3 rounded-md border ${
               darkMode
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
             required
+            autoFocus
           />
         </div>
 
@@ -124,15 +119,15 @@ const Signup = ({ onSignupSuccess }) => {
         <div className="mb-4">
           <input
             type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Enter your email"
             className={`w-full p-3 rounded-md border ${
               darkMode
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
             required
           />
         </div>
@@ -141,15 +136,15 @@ const Signup = ({ onSignupSuccess }) => {
         <div className="mb-4">
           <input
             type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Enter your password"
             className={`w-full p-3 rounded-md border ${
               darkMode
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
             required
           />
         </div>
@@ -158,15 +153,15 @@ const Signup = ({ onSignupSuccess }) => {
         <div className="mb-6">
           <input
             type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
             placeholder="Confirm your password"
             className={`w-full p-3 rounded-md border ${
               darkMode
                 ? "border-gray-700 bg-gray-700 text-gray-300"
                 : "border-gray-300 bg-gray-50 text-gray-800"
             }`}
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
             required
           />
           <div className="mt-2 space-y-1 text-sm">
@@ -177,32 +172,15 @@ const Signup = ({ onSignupSuccess }) => {
                   : "text-red-600"
               }`}
             >
-              <span
-                className={`mr-2 ${
-                  passwordValidations.hasNonAlphanumeric
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {passwordValidations.hasNonAlphanumeric ? "✔" : "✘"}
-              </span>
-              Must contain a non-alphanumeric character
+              {passwordValidations.hasNonAlphanumeric ? "✔" : "✘"} Must contain
+              a non-alphanumeric character
             </div>
             <div
               className={`flex items-center ${
                 passwordValidations.hasDigit ? "text-green-600" : "text-red-600"
               }`}
             >
-              <span
-                className={`mr-2 ${
-                  passwordValidations.hasDigit
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {passwordValidations.hasDigit ? "✔" : "✘"}
-              </span>
-              Must contain a digit
+              {passwordValidations.hasDigit ? "✔" : "✘"} Must contain a digit
             </div>
             <div
               className={`flex items-center ${
@@ -211,16 +189,18 @@ const Signup = ({ onSignupSuccess }) => {
                   : "text-red-600"
               }`}
             >
-              <span
-                className={`mr-2 ${
-                  passwordValidations.hasUpperCase
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {passwordValidations.hasUpperCase ? "✔" : "✘"}
-              </span>
-              Must contain an uppercase letter
+              {passwordValidations.hasUpperCase ? "✔" : "✘"} Must contain an
+              uppercase letter
+            </div>
+            <div
+              className={`flex items-center ${
+                passwordValidations.passwordsMatch
+                  ? "text-green-600"
+                  : "text-red-600"
+              }`}
+            >
+              {passwordValidations.passwordsMatch ? "✔" : "✘"} Passwords must
+              match
             </div>
           </div>
         </div>
@@ -228,14 +208,16 @@ const Signup = ({ onSignupSuccess }) => {
         {/* Signup Button */}
         <button
           onClick={handleSubmit}
-          className={`w-full p-3 rounded-md bg-blue-600 text-white font-bold transition duration-200 hover:bg-blue-500 ${
-            darkMode ? "bg-blue-500" : "bg-blue-600"
+          className={`w-full p-3 rounded-md font-bold transition duration-200 ${
+            darkMode
+              ? "bg-blue-500 hover:bg-blue-400"
+              : "bg-blue-600 text-white hover:bg-blue-500"
           }`}
         >
           Sign Up
         </button>
 
-        {/* Already have an account Link */}
+        {/* Already have an account link */}
         <div className="mt-4 text-center">
           <p className="text-sm">
             Already have an account?{" "}

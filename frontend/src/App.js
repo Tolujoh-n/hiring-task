@@ -10,32 +10,67 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
-axios.defaults.baseURL = "http://localhost:5140"; // Set the backend base URL
-axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem(
-  "jwtToken"
-)}`;
+axios.defaults.baseURL = "http://localhost:5140"; // Set backend base URL
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
 
-  // Check if the user is loggedin
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken"); // Or sessionStorage
-    if (token) {
-      // Optionally validate token or decode it
-      setIsLoggedIn(true);
-    }
-  }, []);
-
+  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("jwtToken");
     setIsLoggedIn(false);
+    setUserId(null);
     toast.success("Logged out successfully");
-    window.location.href = "/login"; // Redirect to the login page
   };
 
-  const [darkMode, setDarkMode] = useState(false);
+  // Verify token and fetch user info
+  const verifyAndFetchUserInfo = async () => {
+    const token = localStorage.getItem("jwtToken");
+    console.log("Token from localStorage:", token);
+
+    if (token) {
+      try {
+        // Decode token to check expiration
+        const decoded = jwtDecode(token);
+        const isTokenExpired = decoded.exp * 1000 < Date.now();
+        if (isTokenExpired) {
+          handleLogout();
+        } else {
+          setIsLoggedIn(true);
+
+          // Fetch user info from API
+          const userInfoResponse = await axios.get("/api/v1/auth/user-info", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const { userId, username } = userInfoResponse.data;
+          setUserId(userId);
+
+          console.log("User Info:", { userId, username });
+        }
+      } catch (error) {
+        console.error("Error decoding or fetching token info:", error);
+        handleLogout();
+      }
+    }
+  };
+
+  useEffect(() => {
+    verifyAndFetchUserInfo();
+  }, []);
+
+  // Axios interceptor to set Authorization header
+  axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -43,50 +78,62 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div
+      className={`min-h-screen ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-800"
+      }`}
+    >
       <Toaster position="top-right" />
-      <div
-        className={`min-h-screen ${
-          darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-100 text-gray-800"
-        }`}
-      >
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isLoggedIn ? (
-                  <Navigate to="/dashboard" />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
-              path="/signup"
-              element={<Signup onSignupSuccess={() => setIsLoggedIn(true)} />}
-            />
-            <Route
-              path="/login"
-              element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />}
-            />
-            <Route
-              path="/dashboard"
-              element={
-                isLoggedIn ? (
-                  <Dashboard
-                    darkMode={darkMode}
-                    toggleDarkMode={toggleDarkMode}
-                    handleLogout={handleLogout}
-                  />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-          </Routes>
-        </Router>
-      </div>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Navigate to="/dashboard" />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Signup
+                onSignupSuccess={() => {
+                  setIsLoggedIn(true);
+                  verifyAndFetchUserInfo();
+                }}
+                darkMode={darkMode}
+                toggleDarkMode={toggleDarkMode}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <Login
+                onLoginSuccess={() => {
+                  setIsLoggedIn(true);
+                  verifyAndFetchUserInfo();
+                }}
+                darkMode={darkMode}
+                toggleDarkMode={toggleDarkMode}
+              />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              isLoggedIn ? (
+                <Dashboard userId={userId} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+        </Routes>
+      </Router>
     </div>
   );
 };

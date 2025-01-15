@@ -12,41 +12,85 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 
-const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
+const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const [todos, setTodos] = useState([]);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState("date-desc");
   const [isNavOpen, setIsNavOpen] = useState(true);
 
+  // Fetch user info if missing
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:5140/api/v1/auth/user-info",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const userData = response.data;
+      setUserId(userData.id);
+      setUsername(userData.username);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("username", userData.username);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      if (error.response?.status === 401) {
+        onLogout();
+      }
+    }
+  };
+
+  // Fetch todos
   const fetchTodos = async () => {
     try {
-      const response = await axios.get("/api/v1/todos");
-      setTodos(response.data);
+      const response = await axios.get("http://localhost:5140/api/v1/todos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Ensure response.data is an array
+      if (Array.isArray(response.data)) {
+        setTodos(response.data);
+      } else {
+        console.error("Unexpected API response:", response.data);
+        setTodos([]); // Set to empty array if the response isn't an array
+      }
     } catch (error) {
       console.error("Error fetching todos:", error);
-      toast.error("Failed to fetch todos");
+      if (error.response?.status === 401) {
+        onLogout();
+      }
     }
   };
 
+  // Load data on mount
   useEffect(() => {
-    fetchTodos();
-  }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/v1/todos/${id}`);
-      setTodos(todos.filter((todo) => todo.id !== id));
-      toast.success("Todo deleted successfully");
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-      toast.error("Failed to delete todo");
+    if (!userId || !username) {
+      fetchUserInfo();
     }
-  };
+    fetchTodos();
+  }, [userId]);
 
+  // Add a todo
   const handleAddTodo = async (newTodo) => {
     try {
-      const response = await axios.post("/api/v1/todos", newTodo);
+      const response = await axios.post(
+        "http://localhost:5140/api/v1/todos",
+        { ...newTodo, userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setTodos([...todos, response.data]);
       toast.success("Todo added successfully");
       closeModal();
@@ -56,11 +100,17 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
     }
   };
 
+  // Update a todo
   const handleUpdateTodo = async (updatedTodo) => {
     try {
       const response = await axios.put(
-        `/api/v1/todos/${updatedTodo.id}`,
-        updatedTodo
+        `http://localhost:5140/api/v1/todos/${updatedTodo.id}`,
+        { ...updatedTodo, userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setTodos(
         todos.map((todo) => (todo.id === updatedTodo.id ? response.data : todo))
@@ -71,6 +121,48 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
       console.error("Error updating todo:", error);
       toast.error("Failed to update todo");
     }
+  };
+
+  // Delete a todo
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5140/api/v1/todos/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTodos(todos.filter((todo) => todo.id !== id));
+      toast.success("Todo deleted successfully");
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      toast.error("Failed to delete todo");
+    }
+  };
+
+  // Filter and sorting logic
+  const applyFilter = (filterType) => {
+    if (!Array.isArray(todos)) {
+      console.error("Cannot sort todos: not an array", todos);
+      return;
+    }
+
+    const sorted = [...todos].sort((a, b) => {
+      if (filterType.includes("date")) {
+        return filterType === "date-asc"
+          ? new Date(a.dueDate) - new Date(b.dueDate)
+          : new Date(b.dueDate) - new Date(a.dueDate);
+      } else {
+        return filterType === "name-asc"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      }
+    });
+    setTodos(sorted);
+  };
+
+  const handleFilterChange = (filterType) => {
+    setFilter(filterType);
+    applyFilter(filterType);
   };
 
   const openModalForAdd = () => {
@@ -86,10 +178,6 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleFilterChange = (filterType) => {
-    setFilter(filterType);
-    applyFilter(filterType);
-  };
   const handleStatusToggle = (todoId) => {
     const updatedTodos = todos.map((t) =>
       t.id === todoId ? { ...t, status: !t.status } : t
@@ -105,32 +193,19 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
     }
   };
 
-  const applyFilter = (filterType) => {
-    const sorted = [...todos].sort((a, b) => {
-      if (filterType.includes("date")) {
-        return filterType === "date-asc"
-          ? new Date(a.dueDate) - new Date(b.dueDate)
-          : new Date(b.dueDate) - new Date(a.dueDate);
-      } else {
-        return filterType === "name-asc"
-          ? a.title.localeCompare(b.title)
-          : b.title.localeCompare(a.title);
-      }
-    });
-    setTodos(sorted);
-  };
-
-  const sortedTodos = todos.sort((a, b) => {
-    if (filter.includes("date")) {
-      return filter === "date-asc"
-        ? new Date(a.dueDate) - new Date(b.dueDate)
-        : new Date(b.dueDate) - new Date(a.dueDate);
-    } else {
-      return filter === "name-asc"
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title);
-    }
-  });
+  const sortedTodos = Array.isArray(todos)
+    ? todos.sort((a, b) => {
+        if (filter.includes("date")) {
+          return filter === "date-asc"
+            ? new Date(a.dueDate) - new Date(b.dueDate)
+            : new Date(b.dueDate) - new Date(a.dueDate);
+        } else {
+          return filter === "name-asc"
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        }
+      })
+    : [];
 
   return (
     <div className={`flex min-h-screen ${darkMode ? "dark" : ""}`}>
@@ -225,7 +300,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, handleLogout }) => {
           </ul>
           <button
             className="absolute bottom-0 inset-x-0 bg-red-500 text-white p-2 m-4 rounded-lg w-auto text-center hover:bg-red-600 transition-all duration-300"
-            onClick={handleLogout}
+            onClick={onLogout}
           >
             Logout
           </button>
