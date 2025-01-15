@@ -16,7 +16,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const [todos, setTodos] = useState([]);
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [username, setUsername] = useState(localStorage.getItem("username"));
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token] = useState(localStorage.getItem("token"));
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState("date-desc");

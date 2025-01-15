@@ -1,6 +1,0 @@
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.csproj.AssemblyReference.cache
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.AssemblyInfoInputs.cache
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.AssemblyInfo.cs
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.csproj.CoreCompileInputs.cache
-C:\Users\John PC\Desktop\startups\hiring-task\backend\TodoApp.Tests\obj\Debug\net9.0\TodoApp.Tests.sourcelink.json
