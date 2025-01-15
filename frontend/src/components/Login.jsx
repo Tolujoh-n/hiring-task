@@ -40,6 +40,7 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
 
       toast.success("Login successful!");
       navigate("/dashboard");
+      window.location.reload();
     } catch (error) {
       console.error("Error during login:", error);
       toast.error("Login failed. Please check your credentials.");
@@ -108,6 +109,12 @@ const Login = ({ onLoginSuccess, darkMode, toggleDarkMode }) => {
           >
             Don't have an account? Sign up
           </Link>
+        </div>
+        {/* Dark Mode Toggle */}
+        <div className="absolute top-4 right-4">
+          <button onClick={toggleDarkMode} className="text-2xl">
+            {darkMode ? <FaSun /> : <FaMoon />}
+          </button>
         </div>
       </div>
     </div>

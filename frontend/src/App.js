@@ -15,7 +15,7 @@ import { jwtDecode } from "jwt-decode";
 axios.defaults.baseURL = "http://localhost:5140"; // Set backend base URL
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [userId, setUserId] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
