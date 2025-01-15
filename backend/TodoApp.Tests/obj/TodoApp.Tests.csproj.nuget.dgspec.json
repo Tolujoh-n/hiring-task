@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj": {}
+    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\TodoApp.Tests\\TodoApp.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj": {
+    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\TodoApp.Tests\\TodoApp.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj",
-        "projectName": ".",
-        "projectPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj",
+        "projectUniqueName": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\TodoApp.Tests\\TodoApp.Tests.csproj",
+        "projectName": "TodoApp.Tests",
+        "projectPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\TodoApp.Tests\\TodoApp.Tests.csproj",
         "packagesPath": "C:\\Users\\John PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\obj\\",
+        "outputPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\TodoApp.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\John PC\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -44,33 +44,21 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+            "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[17.11.1, )"
             },
-            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+            "coverlet.collector": {
               "target": "Package",
-              "version": "[9.0.0, )"
-            },
-            "Microsoft.AspNetCore.Mvc.Testing": {
-              "target": "Package",
-              "version": "[9.0.1, )"
-            },
-            "Microsoft.AspNetCore.OpenApi": {
-              "target": "Package",
-              "version": "[9.0.0, )"
-            },
-            "Microsoft.EntityFrameworkCore.InMemory": {
-              "target": "Package",
-              "version": "[9.0.0, )"
-            },
-            "Moq": {
-              "target": "Package",
-              "version": "[4.20.72, )"
+              "version": "[6.0.2, )"
             },
             "xunit": {
               "target": "Package",
-              "version": "[2.9.3, )"
+              "version": "[2.9.2, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.8.2, )"
             }
           },
           "imports": [
@@ -85,9 +73,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
