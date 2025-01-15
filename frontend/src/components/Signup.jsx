@@ -68,6 +68,7 @@ const Signup = ({ onSignupSuccess }) => {
       toast.success("Login your account!");
 
       if (onSignupSuccess) onSignupSuccess();
+
       navigate("/login");
     } catch (error) {
       let errorMsg = "An error occurred during signup(change username).";

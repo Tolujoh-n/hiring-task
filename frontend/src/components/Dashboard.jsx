@@ -26,14 +26,11 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const fetchUserInfo = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(
-        "http://localhost:5140/api/v1/auth/user-info",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("/api/v1/auth/user-info", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const userData = response.data;
       setUserId(userData.id);
       setUsername(userData.username);
@@ -50,7 +47,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   // Fetch todos
   const fetchTodos = async () => {
     try {
-      const response = await axios.get("http://localhost:5140/api/v1/todos", {
+      const response = await axios.get("/api/v1/todos", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -77,7 +74,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
       const updatedStatus = !todoToUpdate.status;
 
       const response = await axios.put(
-        `http://localhost:5140/api/v1/todos/${todoId}`,
+        `/api/v1/todos/${todoId}`,
         { ...todoToUpdate, status: updatedStatus },
         {
           headers: {
@@ -110,7 +107,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const handleAddTodo = async (newTodo) => {
     try {
       const response = await axios.post(
-        "http://localhost:5140/api/v1/todos",
+        "/api/v1/todos",
         { ...newTodo, userId },
         {
           headers: {
@@ -131,7 +128,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const handleUpdateTodo = async (updatedTodo) => {
     try {
       const response = await axios.put(
-        `http://localhost:5140/api/v1/todos/${updatedTodo.id}`,
+        `/api/v1/todos/${updatedTodo.id}`,
         { ...updatedTodo, userId },
         {
           headers: {
@@ -153,7 +150,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   // Delete a todo
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5140/api/v1/todos/${id}`, {
+      await axios.delete(`/api/v1/todos/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
