@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj": {}
+    "C:\\Users\\John PC\\Desktop\\workshop\\hiring-task\\backend\\..csproj": {}
   },
   "projects": {
-    "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj": {
+    "C:\\Users\\John PC\\Desktop\\workshop\\hiring-task\\backend\\..csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj",
+        "projectUniqueName": "C:\\Users\\John PC\\Desktop\\workshop\\hiring-task\\backend\\..csproj",
         "projectName": ".",
-        "projectPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\..csproj",
+        "projectPath": "C:\\Users\\John PC\\Desktop\\workshop\\hiring-task\\backend\\..csproj",
         "packagesPath": "C:\\Users\\John PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\John PC\\Desktop\\startups\\hiring-task\\backend\\obj\\",
+        "outputPath": "C:\\Users\\John PC\\Desktop\\workshop\\hiring-task\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\John PC\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -46,11 +46,11 @@
           "dependencies": {
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[9.0.1, )"
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[9.0.1, )"
             },
             "Microsoft.AspNetCore.Mvc.Testing": {
               "target": "Package",
@@ -60,9 +60,23 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.1, )"
+            },
             "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[9.0.1, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.1, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.1, )"
             },
             "Moq": {
               "target": "Package",

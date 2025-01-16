@@ -42,7 +42,7 @@ dotnet add package Microsoft.EntityFrameworkCore.InMemory
 ```
 
 - Run the Backend Server: `dotnet run`
-- The backend will now be running on http://localhost:5140
+- The backend will now be running on http://localhost:5140 or a relative localhost port, If your backend is running on a different port set the backend baseURL in `/frontend/src/app.js` file to the port your backend is running `axios.defaults.baseURL = "http://localhost:5140";`
 
 ## Set Up the Frontend
 
@@ -78,7 +78,7 @@ npm install --legacy-peer-deps
 
 ## Conclusion
 
-Following these steps will set up the Todo List application locally with both the frontend and backend running on your machine. You should now be able to:
+Following these steps will set up the Todo List application locally with both the frontend and backend running on your machine. You should now be able to::
 
 - Create, read, update, and delete Todo items.
 - Authenticate users using JWT.
