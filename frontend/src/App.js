@@ -12,7 +12,7 @@ import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-axios.defaults.baseURL = "http://localhost:5140"; // Set backend base URL
+axios.defaults.baseURL = "http://localhost:5196"; // Set backend base URL
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);

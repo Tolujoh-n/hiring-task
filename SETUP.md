@@ -26,7 +26,7 @@ Before you begin, ensure that you have the following installed:
 
 The backend is built with ASP.NET Core and provides the authentication system as well as a REST API for managing todo items.
 
-- Install Backend Dependencies, Navigate to the backend directory: `cd backend`
+- Install Backend Dependencies, Navigate to the backend directory: `cd backend/tolutodd/`
 
 - Install the required NuGet packages:
 
@@ -42,7 +42,7 @@ dotnet add package Microsoft.EntityFrameworkCore.InMemory
 ```
 
 - Run the Backend Server: `dotnet run`
-- The backend will now be running on http://localhost:5140 or a relative localhost port, If your backend is running on a different port set the backend baseURL in `/frontend/src/app.js` file to the port your backend is running `axios.defaults.baseURL = "http://localhost:5140";`
+- The backend will now be running on http://localhost:5196 or a relative localhost port, If your backend is running on a different port set the backend baseURL in `/frontend/src/app.js` file to the port your backend is running `axios.defaults.baseURL = "http://localhost:5196";`
 
 ## Set Up the Frontend
 
