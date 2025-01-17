@@ -9,7 +9,6 @@ Before you begin, ensure that you have the following installed:
 - **[Node.js](https://nodejs.org/en/)**: Required for running the React application.
 - **[npm](https://www.npmjs.com/)**: Package manager that comes with Node.js.
 - **[.NET SDK](https://dotnet.microsoft.com/download/dotnet)**: Required for building and running the ASP.NET Core backend.
-- **SQL Server**: Required to store user and Todo data. You can download it from [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads).
 
 ## 1. Clone the Git Repository
 
@@ -56,7 +55,7 @@ The frontend is built with React and communicates with the backend API to handle
 
 - The frontend application will be available at http://localhost:3000.
 
-## Run Tests (Optional)
+## Run Tests 
 
 You can run the frontend test suite to ensure everything is working as expected: `npm test` This will execute the unit tests using Jest.
 
