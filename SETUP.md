@@ -55,7 +55,7 @@ The frontend is built with React and communicates with the backend API to handle
 
 - The frontend application will be available at http://localhost:3000.
 
-## Run Tests (Optional)
+## Run Tests 
 
 You can run the frontend test suite to ensure everything is working as expected: `npm test` This will execute the unit tests using Jest.
 
