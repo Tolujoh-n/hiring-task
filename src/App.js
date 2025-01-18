@@ -8,6 +8,7 @@ import {
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import Welcome from "./components/Welcome";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -105,8 +106,14 @@ const App = () => {
           <Route
             path="/"
             element={
+              <Welcome darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
               isLoggedIn ? (
-                <Navigate to="/dashboard" />
+                <Dashboard onLogout={handleLogout} />
               ) : (
                 <Navigate to="/login" />
               )
