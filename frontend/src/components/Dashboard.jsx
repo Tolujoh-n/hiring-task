@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "sonner";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const [todos, setTodos] = useState([]);
@@ -21,6 +22,12 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState("date-desc");
   const [isNavOpen, setIsNavOpen] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    onLogout();
+    navigate("/");
+  };
 
   // Fetch user info if missing
   const fetchUserInfo = async () => {
@@ -316,7 +323,7 @@ const Dashboard = ({ darkMode, toggleDarkMode, onLogout }) => {
           </ul>
           <button
             className="absolute bottom-0 inset-x-0 bg-red-500 text-white p-2 m-4 rounded-lg w-auto text-center hover:bg-red-600 transition-all duration-300"
-            onClick={onLogout}
+            onClick={handleLogout}
           >
             Logout
           </button>

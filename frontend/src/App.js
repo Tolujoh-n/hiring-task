@@ -8,11 +8,12 @@ import {
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import Welcome from "./components/Welcome";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-axios.defaults.baseURL = "https://tolujohnofficial.bsite.net/"; // Set backend base URL
+axios.defaults.baseURL = "http://localhost:5196"; // Set backend base URL
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -105,8 +106,18 @@ const App = () => {
           <Route
             path="/"
             element={
+              <Welcome darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
               isLoggedIn ? (
-                <Navigate to="/dashboard" />
+                <Dashboard
+                  darkMode={darkMode}
+                  toggleDarkMode={toggleDarkMode}
+                  onLogout={handleLogout}
+                />
               ) : (
                 <Navigate to="/login" />
               )
